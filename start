@@ -1,0 +1,4 @@
+#!/bin/bash
+screen -dm python3.6 manage.py runserver
+cd search_engine
+screen -dm python3.6 start_crawl_data_schedule.py

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% load static %}
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- Metro 4 -->
+  <link rel="stylesheet" href="{% static 'metro-4.2.7/css/metro-all.min.css' %}">
+
+  <title>Search Engine</title>
+</head>
+
+<body>
+  <!-- jQuery first, then Metro UI JS -->
+  <script src="{% static 'jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'metro-4.2.7/js/metro.min.js' %}"></script>
+
+  <div class="container">
+    <div class="grid">
+      <div class="row" style="margin-top:30px;">
+        <div class="cell-12">
+          <div class='display3'>
+            <center>VnExpress Search Engine</center>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:30px;">
+        <div class="cell-12">
+          <form id="query_form">
+            <input id="query" type="text" data-role="search" data-search-button-click="submit">
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="cell">
+          <div class='display1' style="margin-bottom:0">
+            <left><span id="info"></span></left>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="cell">
+          <div id='result'>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="no-query" class="info-box" data-role="infobox">
+    <span class="button square closer"></span>
+    <div class="info-box-content">
+      <h3>Please enter query!</h3>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $("#query_form").submit(function(event) {
+        query = $('#query').val();
+        if (query == "")
+          $('#no-query').data('infobox').open();
+        else
+          $.get("", {
+            query: query
+          }, function(data, status) {
+            if (data === "") {
+              $('#info').html("No result");
+              $('#result').html("");
+            } else {
+              $('#result').html(data);
+              result_count = $('#result-table tr').length - 1;
+              $('#info').html(result_count + " result(s) found");
+            }
+          });
+        event.preventDefault();
+      });
+    });
+  </script>
+</body>
+
+</html>
