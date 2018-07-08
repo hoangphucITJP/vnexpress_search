@@ -1,5 +1,6 @@
 from glob import glob
 import re
+import os
 import numpy as np
 import gzip
 import subprocess
@@ -12,11 +13,13 @@ alpha = 0.4
 max_df = 1
 min_df = 0
 
+BASE = os.path.dirname(os.path.abspath(__file__))
+
 def tokenize(input_string):
     with open('tmp', mode='w') as tmp_file:
         tmp_file.write(input_string)
         
-    subprocess.run(['java', '-jar', '/media/kyouko/Transcend/DT/PJ/Python/VSM System/VSM/source/search_engine/packages/vitk-tok-5.1.jar', 'tmp', 'tmp'])
+    subprocess.run(['java', '-jar', BASE + '/vitk-tok-5.1.jar', 'tmp', 'tmp'])
     with open('tmp', mode='r') as tmp_file:
         data = tmp_file.read()
     
@@ -39,6 +42,7 @@ def preprocess_text(query):
     q = remove_stop_words(q)
     q = remove_number_contained(q)
     q = ' '.join(q)
+    print(q)
     return q
     
 
@@ -152,13 +156,18 @@ def build(dataPattern):
 
     with gzip.GzipFile(model_path + "/idf.npy.gz", "w") as idf_zip:
         np.save(idf_zip, query.idf)
+        
+    print('Complete building model...')
     
     
 
 def query(arg, top_k, threshold, pmodel_path, data_path, cosine_threshold=0):
     global model_path
     model_path = pmodel_path
-    if not hasattr(query, 'tf_idf'):
+    
+    with open(BASE + '/../data/model_reload.req', 'r') as reload_request_file:
+        reload_request = reload_request_file.read()
+    if not hasattr(query, 'tf_idf') or reload_request=='True':
         print('Loading model...')
         dataPattern = data_path + '/*/*'
         query.dataFile = glob(dataPattern)
@@ -173,6 +182,8 @@ def query(arg, top_k, threshold, pmodel_path, data_path, cosine_threshold=0):
             query.idf = np.load(idf_zip)
             
         print('Complete loading model...')
+        with open(BASE + '/../data/model_reload.req', 'w') as reload_request_file:
+            reload_request_file.write('False')
 
     preprocessed_query = preprocess_text(arg)
     query_tfidf = query_to_tfidf(preprocessed_query, query.idf, query.vocabulary)

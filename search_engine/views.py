@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
+from django.shortcuts import redirect
 import os.path
 from prettytable import PrettyTable
 import numpy as np
@@ -21,7 +22,6 @@ def index(request):
         result = vsm.query(query, top_k, 50, BASE + "/model", BASE + "/data")
         
         documents = result[0]
-        print(documents)
         if len(documents) == 0:
             return HttpResponse("")
             
@@ -67,3 +67,6 @@ def document(request):
     with open(BASE + '/data/' + query) as doc_file:
         doc_data = doc_file.read()
     return HttpResponse(doc_data)
+    
+def redirect_to_home():
+    return redirect('index')

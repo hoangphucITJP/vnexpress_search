@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='search_engine/index')),
     path('search_engine/', include('search_engine.urls')),
     path('admin/', admin.site.urls),
 ]
